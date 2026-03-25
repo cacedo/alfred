@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.carlosacedo.alfred.gitlab-project-search</string>
+	<key>category</key>
+	<string>Internet</string>
+	<key>connections</key>
+	<dict>
+		<key>A5CEAF44-DCCE-46E7-B32F-2323AA9E7B74</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>DBEDD4EF-B156-48AC-B82B-A53F76DA0104</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>OpenAI Codex</string>
+	<key>description</key>
+	<string>Search GitLab projects and repositories from Alfred with the gl keyword.</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>GitLab Project Search</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>gl</string>
+				<key>queuedelaycustom</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Searching GitLab projects…</string>
+				<key>script</key>
+				<string>python3 scripts/gitlab_search.py "{query}"</string>
+				<key>subtext</key>
+				<integer>1</integer>
+				<key>title</key>
+				<string>Search GitLab Projects</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>A5CEAF44-DCCE-46E7-B32F-2323AA9E7B74</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>0</integer>
+				<key>script</key>
+				<string>python3 scripts/gitlab_open.py "{query}"</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>DBEDD4EF-B156-48AC-B82B-A53F76DA0104</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>Use gl &lt;query&gt; to search. Configure GITLAB_HOST, GITLAB_USER, and GITLAB_TOKEN in the workflow configuration.</string>
+	<key>uidata</key>
+	<dict>
+		<key>A5CEAF44-DCCE-46E7-B32F-2323AA9E7B74</key>
+		<dict>
+			<key>xpos</key>
+			<integer>80</integer>
+			<key>ypos</key>
+			<integer>120</integer>
+		</dict>
+		<key>DBEDD4EF-B156-48AC-B82B-A53F76DA0104</key>
+		<dict>
+			<key>xpos</key>
+			<integer>360</integer>
+			<key>ypos</key>
+			<integer>120</integer>
+		</dict>
+	</dict>
+	<key>variables</key>
+	<dict>
+		<key>GITLAB_HOST</key>
+		<string></string>
+		<key>GITLAB_TOKEN</key>
+		<string></string>
+		<key>GITLAB_USER</key>
+		<string></string>
+	</dict>
+	<key>version</key>
+	<string>1.0.7</string>
+	<key>webaddress</key>
+	<string>https://gitlab.com</string>
+</dict>
+</plist>
