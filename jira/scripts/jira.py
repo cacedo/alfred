@@ -21,19 +21,15 @@ ACCESSIBLE_RESOURCES_URL = "https://api.atlassian.com/oauth/token/accessible-res
 DEFAULT_PORT = "8765"
 DEFAULT_SCOPES = "offline_access read:jira-work"
 STATE_TTL_SECONDS = 300
+SITE_CACHE_TTL_SECONDS = 3600
 SEARCH_LIMIT = 20
-SEARCH_FETCH_LIMIT = 100
+SEARCH_FETCH_LIMIT = 40
 SITE_FILTER_QUERY = "/sites"
 AUTH_QUERY = "/auth"
 LOGOUT_QUERY = "/logout"
 HELP_QUERY = "/help"
 MY_OPEN_QUERY = "/mine"
 JQL_PREFIX = "jql:"
-ALLOWED_ICON_HOST_SUFFIXES = (
-    ".atlassian.com",
-    ".atlassian.net",
-    ".atl-paas.net",
-)
 ALLOWED_BROWSER_HOST_SUFFIXES = (
     ".atlassian.com",
     ".atlassian.net",
@@ -260,12 +256,40 @@ def accessible_sites(access_token):
     return jira_sites
 
 
+def cached_sites(tokens):
+    expires_at = tokens.get("sites_cache_expires_at", 0)
+    sites = tokens.get("sites_cache")
+    if not isinstance(sites, list) or time.time() >= expires_at:
+        return None
+    valid_sites = [
+        site
+        for site in sites
+        if isinstance(site, dict) and site.get("id") and site.get("name") and site.get("url")
+    ]
+    return valid_sites or None
+
+
+def store_sites_cache(tokens, sites):
+    tokens["sites_cache"] = [
+        {"id": site["id"], "name": site["name"], "url": site["url"]}
+        for site in sites
+    ]
+    tokens["sites_cache_expires_at"] = time.time() + SITE_CACHE_TTL_SECONDS
+
+
 def ensure_selected_site(tokens, access_token):
-    sites = accessible_sites(access_token)
+    sites = cached_sites(tokens)
+    cache_updated = False
+    if not sites:
+        sites = accessible_sites(access_token)
+        store_sites_cache(tokens, sites)
+        cache_updated = True
     selected_id = tokens.get("selected_site_id")
     if selected_id:
         for site in sites:
             if site["id"] == selected_id:
+                if cache_updated:
+                    save_tokens(tokens)
                 return site, sites
     chosen = sites[0]
     tokens["selected_site_id"] = chosen["id"]
@@ -323,7 +347,7 @@ def build_empty_result_browser_jql(query):
 def search_by_jql(access_token, site, raw_jql, max_results=SEARCH_FETCH_LIMIT):
     payload = {
         "jql": raw_jql,
-        "fields": ["summary", "status", "issuetype", "priority", "project", "assignee", "created"],
+        "fields": ["summary", "status", "issuetype", "assignee", "created"],
         "maxResults": max_results,
         "fieldsByKeys": False,
     }
@@ -382,47 +406,14 @@ def rank_default_search_results(issues, query):
     return [issue for *_, issue in ranked[:SEARCH_LIMIT]]
 
 
-def issue_type_icon_path(access_token, fields):
+def issue_type_icon_path(fields):
     issue_type = fields.get("issuetype") or {}
-    icon_url = (issue_type.get("iconUrl") or "").strip()
     issue_type_id = str(issue_type.get("id") or issue_type.get("name") or "issue").strip()
-    if not icon_url:
-        return bundled_default_icon()
-
     safe_id = re.sub(r"[^A-Za-z0-9._-]+", "-", issue_type_id)
     destination = icon_cache_dir() / f"issuetype-v5-{safe_id}.png"
     if destination.exists() and destination.stat().st_size > 0:
         return str(destination)
-
-    parsed = urllib.parse.urlparse(icon_url)
-    host = (parsed.hostname or "").lower()
-    if (
-        parsed.scheme != "https"
-        or not host
-        or parsed.username
-        or parsed.password
-        or not any(host == suffix[1:] or host.endswith(suffix) for suffix in ALLOWED_ICON_HOST_SUFFIXES)
-    ):
-        return bundled_default_icon()
-
-    query = urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)
-    filtered = [(key, value) for key, value in query if key.lower() not in {"format", "size"}]
-    filtered.extend([("size", "large"), ("format", "png")])
-    png_url = urllib.parse.urlunparse(
-        parsed._replace(query=urllib.parse.urlencode(filtered))
-    )
-
-    request = urllib.request.Request(png_url, headers={"Authorization": f"Bearer {access_token}"})
-    try:
-        with urllib.request.urlopen(request, timeout=30) as response:
-            body = response.read()
-            content_type = (response.headers.get("Content-Type") or "").lower()
-            if "png" not in content_type and not body.startswith(b"\x89PNG\r\n\x1a\n"):
-                return bundled_default_icon()
-            destination.write_bytes(body)
-        return str(destination)
-    except Exception:
-        return bundled_default_icon()
+    return bundled_default_icon()
 
 
 def is_allowed_browser_url(value):
@@ -525,7 +516,7 @@ def search_items(query):
         raw_jql = build_my_open_issues_jql()
         try:
             issues = search_by_jql(access_token, selected_site, raw_jql)
-            return format_jql_items(issues, selected_site, access_token, raw_jql, raw_jql)
+            return format_jql_items(issues, selected_site, raw_jql)
         except JiraError as exc:
             return [item("Jira search failed", str(exc))]
     if query.startswith(SITE_FILTER_QUERY):
@@ -553,23 +544,23 @@ def search_items(query):
         if query.lower().startswith(JQL_PREFIX):
             raw_jql = query[len(JQL_PREFIX):].strip()
             issues = search_by_jql(access_token, selected_site, raw_jql)
-            return format_jql_items(issues, selected_site, access_token, raw_jql, raw_jql)
+            return format_jql_items(issues, selected_site, raw_jql)
         raw_jql = build_default_search_jql(query)
         issues = search_by_jql(access_token, selected_site, raw_jql)
         issues = rank_default_search_results(issues, query)
-        return format_jql_items(issues, selected_site, access_token, raw_jql, build_empty_result_browser_jql(query))
+        return format_jql_items(issues, selected_site, build_empty_result_browser_jql(query))
     except JiraError as exc:
         return [item("Jira search failed", str(exc))]
 
 
-def format_jql_items(issues, site, access_token, raw_jql, empty_result_jql):
+def format_jql_items(issues, site, empty_result_jql):
     items = []
     for issue in issues[:SEARCH_LIMIT]:
         fields = issue.get("fields", {})
         status = compact_status(fields)
         owner = assignee_name(fields)
         created = created_date(fields)
-        icon_path = issue_type_icon_path(access_token, fields)
+        icon_path = issue_type_icon_path(fields)
         detail_bits = [status, owner]
         if created:
             detail_bits.append(created)
@@ -781,6 +772,7 @@ def perform_auth():
     }
     access_token = tokens["access_token"]
     sites = accessible_sites(access_token)
+    store_sites_cache(tokens, sites)
     tokens["selected_site_id"] = sites[0]["id"]
     save_tokens(tokens)
 
