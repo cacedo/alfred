@@ -27,6 +27,7 @@ SITE_FILTER_QUERY = "/sites"
 AUTH_QUERY = "/auth"
 LOGOUT_QUERY = "/logout"
 HELP_QUERY = "/help"
+MY_OPEN_QUERY = "/mine"
 JQL_PREFIX = "jql:"
 ALLOWED_ICON_HOST_SUFFIXES = (
     ".atlassian.com",
@@ -113,7 +114,7 @@ def alfred_items(items):
     print(json.dumps({"items": items}))
 
 
-def item(title, subtitle, arg=None, valid=False, uid=None, icon_path=None, mods=None):
+def item(title, subtitle, arg=None, valid=False, uid=None, icon_path=None, mods=None, autocomplete=None):
     result = {
         "title": title,
         "subtitle": subtitle,
@@ -127,6 +128,8 @@ def item(title, subtitle, arg=None, valid=False, uid=None, icon_path=None, mods=
         result["icon"] = {"path": icon_path}
     if mods:
         result["mods"] = mods
+    if autocomplete:
+        result["autocomplete"] = autocomplete
     return result
 
 
@@ -178,7 +181,7 @@ def setup_help_items():
         item("Authenticate with Jira", "Press Enter to start the OAuth flow.", command_arg("auth"), True),
         item(
             "Search usage",
-            "Use `jira login page` to search, `jira KEY-123` for a ticket key, or `jira jql:assignee=currentUser()` for advanced search.",
+            f"Use `jira login page` to search, `jira KEY-123` for a ticket key, `{MY_OPEN_QUERY}` for your open issues, or `jira jql:assignee=currentUser()` for advanced search.",
         ),
         item(
             "Site selection",
@@ -306,6 +309,10 @@ def build_default_search_jql(query):
 def build_global_search_jql(query):
     escaped = jql_escape(query.strip())
     return f'text ~ "\\"{escaped}\\"" ORDER BY updated DESC'
+
+
+def build_my_open_issues_jql():
+    return "assignee = currentUser() AND statusCategory != Done ORDER BY updated DESC"
 
 
 def build_empty_result_browser_jql(query):
@@ -494,7 +501,12 @@ def search_items(query):
         return [
             item(
                 f"Search Jira issues on {selected_site['name']}",
-                f"Type a search query, or use {AUTH_QUERY}, {SITE_FILTER_QUERY}, {LOGOUT_QUERY}, or {HELP_QUERY}.",
+                f"Type a search query, or use {MY_OPEN_QUERY}, {AUTH_QUERY}, {SITE_FILTER_QUERY}, {LOGOUT_QUERY}, or {HELP_QUERY}.",
+            ),
+            item(
+                "My open issues",
+                f"Autocomplete {MY_OPEN_QUERY} to list your non-done issues on {selected_site['name']}, newest activity first.",
+                autocomplete=MY_OPEN_QUERY,
             ),
             item("Authenticate again", "Refresh the Jira OAuth grant.", command_arg("auth"), True),
             item("Choose site", f"Current site: {selected_site['name']}", command_arg("list-sites"), True),
@@ -509,6 +521,13 @@ def search_items(query):
         return [item("Sign out", "Delete the locally stored Jira tokens.", command_arg("logout"), True)]
     if query == HELP_QUERY:
         return setup_help_items()
+    if query == MY_OPEN_QUERY:
+        raw_jql = build_my_open_issues_jql()
+        try:
+            issues = search_by_jql(access_token, selected_site, raw_jql)
+            return format_jql_items(issues, selected_site, access_token, raw_jql, raw_jql)
+        except JiraError as exc:
+            return [item("Jira search failed", str(exc))]
     if query.startswith(SITE_FILTER_QUERY):
         typed = query[len(SITE_FILTER_QUERY):].strip().lower()
         items = []

@@ -5,6 +5,7 @@ Alfred 5 workflow to search and open Jira Cloud tickets with OAuth 2.0.
 ## Features
 
 - Search Jira issues from Alfred with the `jira` keyword
+- List your open issues with `jira /mine`
 - Open issues in the browser
 - OAuth 2.0 authorization code flow with refresh tokens
 - Multi-site support via Atlassian `accessible-resources`
@@ -28,6 +29,7 @@ After importing the workflow into Alfred, set these workflow environment variabl
 ## Usage
 
 - `jira <query>`: search issues
+- `jira /mine`: issues assigned to you where the status category is not Done, ordered by last activity newest first
 - `jira KEY-123`: quick issue lookup
 - `jira jql:assignee = currentUser() AND statusCategory != Done`: raw JQL search
 - `jira /auth`: start OAuth authentication
