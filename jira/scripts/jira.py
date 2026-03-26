@@ -110,7 +110,7 @@ def alfred_items(items):
     print(json.dumps({"items": items}))
 
 
-def item(title, subtitle, arg=None, valid=False, uid=None, icon_path=None, mods=None, autocomplete=None):
+def item(title, subtitle, arg=None, valid=False, uid=None, icon_path=None, mods=None, autocomplete=None, text=None):
     result = {
         "title": title,
         "subtitle": subtitle,
@@ -126,6 +126,8 @@ def item(title, subtitle, arg=None, valid=False, uid=None, icon_path=None, mods=
         result["mods"] = mods
     if autocomplete:
         result["autocomplete"] = autocomplete
+    if text:
+        result["text"] = text
     return result
 
 
@@ -572,6 +574,7 @@ def format_jql_items(issues, site, empty_result_jql):
                 True,
                 uid=issue["key"],
                 icon_path=icon_path,
+                text={"copy": issue["key"]},
                 mods={
                     "cmd": {
                         "valid": True,
