@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>bundleid</key>
+  <string>dev.codex.alfred.confluence</string>
+  <key>category</key>
+  <string>Internet</string>
+  <key>connections</key>
+  <dict>
+    <key>jira-script-filter</key>
+    <array>
+      <dict>
+        <key>destinationuid</key>
+        <string>jira-action</string>
+        <key>modifiers</key>
+        <integer>0</integer>
+        <key>modifiersubtext</key>
+        <string></string>
+        <key>vitoclose</key>
+        <true/>
+      </dict>
+    </array>
+  </dict>
+  <key>createdby</key>
+  <string>Codex</string>
+  <key>description</key>
+  <string>Search and open Confluence Cloud pages in Alfred using OAuth 2.0.</string>
+  <key>name</key>
+  <string>Confluence Search OAuth</string>
+  <key>objects</key>
+  <array>
+    <dict>
+      <key>config</key>
+      <dict>
+        <key>alfredfiltersresults</key>
+        <false/>
+        <key>argumenttype</key>
+        <integer>1</integer>
+        <key>escaping</key>
+        <integer>102</integer>
+        <key>keyword</key>
+        <string>confluence</string>
+        <key>queuedelaycustom</key>
+        <integer>1</integer>
+        <key>queuedelayimmediatelyinitially</key>
+        <true/>
+        <key>runningsubtext</key>
+        <string>Searching Confluence…</string>
+        <key>script</key>
+        <string>/usr/bin/python3 "./scripts/confluence.py" search "{query}"</string>
+        <key>subtext</key>
+        <string>Search Confluence pages and open them in the browser.</string>
+        <key>title</key>
+        <string>Search Confluence</string>
+        <key>type</key>
+        <integer>0</integer>
+        <key>withspace</key>
+        <true/>
+      </dict>
+      <key>type</key>
+      <string>alfred.workflow.input.scriptfilter</string>
+      <key>uid</key>
+      <string>jira-script-filter</string>
+      <key>version</key>
+      <integer>3</integer>
+    </dict>
+    <dict>
+      <key>config</key>
+      <dict>
+        <key>escaping</key>
+        <integer>0</integer>
+        <key>script</key>
+        <string>/usr/bin/python3 "./scripts/confluence.py" action "{query}"</string>
+        <key>type</key>
+        <integer>0</integer>
+      </dict>
+      <key>type</key>
+      <string>alfred.workflow.action.script</string>
+      <key>uid</key>
+      <string>jira-action</string>
+      <key>version</key>
+      <integer>2</integer>
+    </dict>
+  </array>
+  <key>readme</key>
+  <string># Confluence Search for Alfred 5
+
+Search Confluence Cloud pages with OAuth 2.0.
+
+Configure these fields in Alfred's `Configure Workflow...` window:
+
+- `CONFLUENCE_CLIENT_ID`
+- `CONFLUENCE_CLIENT_SECRET`
+
+Recommended callback URL:
+
+- `http://127.0.0.1:8765/callback`
+
+Commands:
+
+- `confluence`
+- `confluence /auth`
+- `confluence /sites`
+- `confluence /logout`
+- `confluence cql:&lt;your query&gt;`
+</string>
+  <key>userconfigurationconfig</key>
+  <array>
+    <dict>
+      <key>config</key>
+      <dict>
+        <key>default</key>
+        <string></string>
+        <key>placeholder</key>
+        <string>Paste your Atlassian OAuth client ID</string>
+        <key>required</key>
+        <true/>
+        <key>trim</key>
+        <true/>
+      </dict>
+      <key>description</key>
+      <string>Create an Atlassian OAuth 2.0 (3LO) app, then paste its client ID here.</string>
+      <key>label</key>
+      <string>Confluence Client ID</string>
+      <key>type</key>
+      <string>textfield</string>
+      <key>variable</key>
+      <string>CONFLUENCE_CLIENT_ID</string>
+    </dict>
+    <dict>
+      <key>config</key>
+      <dict>
+        <key>default</key>
+        <string></string>
+        <key>placeholder</key>
+        <string>Paste your Atlassian OAuth client secret</string>
+        <key>required</key>
+        <true/>
+        <key>trim</key>
+        <true/>
+      </dict>
+      <key>description</key>
+      <string>This is the client secret for the same Atlassian OAuth app.</string>
+      <key>label</key>
+      <string>Confluence Client Secret</string>
+      <key>type</key>
+      <string>textfield</string>
+      <key>variable</key>
+      <string>CONFLUENCE_CLIENT_SECRET</string>
+    </dict>
+  </array>
+  <key>variables</key>
+  <dict>
+    <key>CONFLUENCE_CLIENT_ID</key>
+    <string></string>
+    <key>CONFLUENCE_CLIENT_SECRET</key>
+    <string></string>
+    <key>CONFLUENCE_REDIRECT_PORT</key>
+    <string>8765</string>
+    <key>CONFLUENCE_SCOPES</key>
+    <string>offline_access search:confluence read:confluence-content.summary read:confluence-space.summary</string>
+  </dict>
+  <key>variablesdontexport</key>
+  <array>
+    <string>CONFLUENCE_CLIENT_SECRET</string>
+  </array>
+  <key>uidata</key>
+  <dict>
+    <key>jira-action</key>
+    <dict>
+      <key>xpos</key>
+      <real>460</real>
+      <key>ypos</key>
+      <real>120</real>
+    </dict>
+    <key>jira-script-filter</key>
+    <dict>
+      <key>xpos</key>
+      <real>120</real>
+      <key>ypos</key>
+      <real>120</real>
+    </dict>
+  </dict>
+  <key>version</key>
+  <string>1.0.0</string>
+  <key>webaddress</key>
+  <string>https://developer.atlassian.com/</string>
+</dict>
+</plist>
