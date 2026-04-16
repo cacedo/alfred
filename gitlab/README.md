@@ -8,9 +8,11 @@ The packaged workflow file is [`GitLab-Project-Search.alfredworkflow`](/Users/ca
 
 Open Alfred, go to Workflows, open `GitLab Project Search`, then use `Configure Workflow` to set:
 
-1. `GITLAB_HOST`
-2. `GITLAB_USER`
+1. `GITLABHOST`
+2. `GITLABUSER`
 3. `GITLAB_TOKEN`
+
+The scripts also continue to accept the legacy `GITLAB_HOST` and `GITLAB_USER` variable names for compatibility.
 
 ## Usage
 

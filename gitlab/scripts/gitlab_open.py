@@ -24,7 +24,8 @@ def main() -> None:
     target = sys.argv[1].strip()
     if not target.startswith(("http://", "https://")):
         return
-    configured_host = normalize_host(os.environ.get("GITLAB_HOST", ""))
+    raw_host = os.environ.get("GITLABHOST", "").strip() or os.environ.get("GITLAB_HOST", "").strip()
+    configured_host = normalize_host(raw_host)
     if configured_host:
         target_url = urllib.parse.urlparse(target)
         host_url = urllib.parse.urlparse(configured_host)

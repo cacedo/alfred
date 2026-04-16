@@ -100,10 +100,13 @@ def prefetch_state_dir() -> pathlib.Path:
 
 
 def load_config() -> dict:
+    host = os.environ.get("GITLABHOST", "").strip() or os.environ.get("GITLAB_HOST", "").strip()
+    user = os.environ.get("GITLABUSER", "").strip() or os.environ.get("GITLAB_USER", "").strip()
+    token = os.environ.get("GITLAB_TOKEN", "").strip()
     return {
-        "host": normalize_host(os.environ.get("GITLAB_HOST", "")),
-        "user": os.environ.get("GITLAB_USER", "").strip(),
-        "token": os.environ.get("GITLAB_TOKEN", "").strip(),
+        "host": normalize_host(host),
+        "user": user,
+        "token": token,
     }
 
 
@@ -265,7 +268,7 @@ def setup_items(config: dict) -> list[dict]:
     return [
         item(
             APP_NAME,
-            "Set GITLAB_HOST, GITLAB_USER, and GITLAB_TOKEN in the workflow configuration. "
+            "Set GITLABHOST, GITLABUSER, and GITLAB_TOKEN in the workflow configuration. "
             + " | ".join(status_bits),
         ),
         item(
@@ -378,7 +381,7 @@ def main() -> None:
             [
                 item(
                     "GitLab request failed",
-                    f"HTTP {exc.code}. Check GITLAB_HOST or GITLAB_TOKEN in workflow configuration.",
+                    f"HTTP {exc.code}. Check GITLABHOST or GITLAB_TOKEN in workflow configuration.",
                 )
             ]
         )
@@ -388,7 +391,7 @@ def main() -> None:
             [
                 item(
                     "GitLab host unreachable",
-                    f"{exc.reason}. Verify GITLAB_HOST in workflow configuration.",
+                    f"{exc.reason}. Verify GITLABHOST in workflow configuration.",
                 )
             ]
         )

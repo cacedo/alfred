@@ -90,7 +90,73 @@
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>Use gl &lt;query&gt; to search. Configure GITLAB_HOST, GITLAB_USER, and GITLAB_TOKEN in the workflow configuration.</string>
+	<string>Use gl &lt;query&gt; to search. Configure GITLABHOST, GITLABUSER, and GITLAB_TOKEN in the workflow configuration.</string>
+	<key>userconfigurationconfig</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string></string>
+				<key>placeholder</key>
+				<string>gitlab.com or https://gitlab.example.com</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Enter your GitLab hostname. HTTPS is required unless you are using localhost.</string>
+			<key>label</key>
+			<string>GitLab Host</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>GITLABHOST</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string></string>
+				<key>placeholder</key>
+				<string>your.username</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Used in workflow status text so you can confirm which GitLab account is configured.</string>
+			<key>label</key>
+			<string>GitLab User</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>GITLABUSER</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string></string>
+				<key>placeholder</key>
+				<string>Paste a GitLab personal access token</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>The workflow uses this personal access token for GitLab API requests.</string>
+			<key>label</key>
+			<string>GitLab Token</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>GITLAB_TOKEN</string>
+		</dict>
+	</array>
 	<key>uidata</key>
 	<dict>
 		<key>A5CEAF44-DCCE-46E7-B32F-2323AA9E7B74</key>
@@ -110,6 +176,10 @@
 	</dict>
 	<key>variables</key>
 	<dict>
+		<key>GITLABHOST</key>
+		<string></string>
+		<key>GITLABUSER</key>
+		<string></string>
 		<key>GITLAB_HOST</key>
 		<string></string>
 		<key>GITLAB_TOKEN</key>
