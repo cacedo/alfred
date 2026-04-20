@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>dev.codex.alfred.nexttrain</string>
+	<key>category</key>
+	<string>Travel</string>
+	<key>connections</key>
+	<dict>
+		<key>nexttrain-script-filter</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>nexttrain-action</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<true/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Codex</string>
+	<key>description</key>
+	<string>Show the next three train departures between two configured stations using search.ch.</string>
+	<key>name</key>
+	<string>Next Train</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>nexttrain</string>
+				<key>queuedelaycustom</key>
+				<integer>1</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>runningsubtext</key>
+				<string>Loading departures…</string>
+				<key>script</key>
+				<string>/usr/bin/python3 "./scripts/nexttrain.py" search "{query}"</string>
+				<key>subtext</key>
+				<string>Show the next three departures for the configured route.</string>
+				<key>title</key>
+				<string>Next Train</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>nexttrain-script-filter</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>0</integer>
+				<key>script</key>
+				<string>/usr/bin/python3 "./scripts/nexttrain.py" action "{query}"</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>nexttrain-action</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string># Next Train for Alfred 5
+
+Show the next three departures between two configured stations.
+
+Configure these fields in Alfred's `Configure Workflow...` window:
+
+- `NEXTTRAIN_FROM`
+- `NEXTTRAIN_TO`
+
+Use:
+
+- `nexttrain`
+- `nexttrain /help`
+</string>
+	<key>uidata</key>
+	<dict>
+		<key>nexttrain-action</key>
+		<dict>
+			<key>xpos</key>
+			<integer>460</integer>
+			<key>ypos</key>
+			<integer>120</integer>
+		</dict>
+		<key>nexttrain-script-filter</key>
+		<dict>
+			<key>xpos</key>
+			<integer>120</integer>
+			<key>ypos</key>
+			<integer>120</integer>
+		</dict>
+	</dict>
+	<key>userconfigurationconfig</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string></string>
+				<key>placeholder</key>
+				<string>e.g. Zurich HB</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>The station or stop where the trip starts.</string>
+			<key>label</key>
+			<string>Departure Station</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>NEXTTRAIN_FROM</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string></string>
+				<key>placeholder</key>
+				<string>e.g. Bern</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>The station or stop where the trip ends.</string>
+			<key>label</key>
+			<string>Arrival Station</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>NEXTTRAIN_TO</string>
+		</dict>
+	</array>
+	<key>variables</key>
+	<dict>
+		<key>NEXTTRAIN_FROM</key>
+		<string></string>
+		<key>NEXTTRAIN_TO</key>
+		<string></string>
+	</dict>
+	<key>version</key>
+	<string>1.0.0</string>
+	<key>webaddress</key>
+	<string>https://search.ch/timetable/</string>
+</dict>
+</plist>
