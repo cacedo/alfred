@@ -268,6 +268,29 @@ def confluence_logo_path():
     return str(Path(__file__).resolve().parent.parent / "assets" / "confluence-logo.svg")
 
 
+def confluence_site_url(site):
+    return site["url"].rstrip("/")
+
+
+def confluence_browser_path(path):
+    normalized = "/" + path.lstrip("/")
+    if normalized == "/wiki" or normalized.startswith("/wiki/"):
+        return normalized
+    return f"/wiki{normalized}"
+
+
+def confluence_browser_url(site, path):
+    site_url = confluence_site_url(site)
+    parsed_site = urllib.parse.urlparse(site_url)
+    parsed_path = urllib.parse.urlparse(path)
+    if parsed_path.scheme or parsed_path.netloc:
+        if parsed_path.netloc != parsed_site.netloc:
+            return path
+        normalized_path = confluence_browser_path(parsed_path.path)
+        return urllib.parse.urlunparse(parsed_path._replace(path=normalized_path))
+    return urllib.parse.urljoin(site_url + "/", confluence_browser_path(path).lstrip("/"))
+
+
 def cql_escape(value):
     return value.replace("\\", "\\\\").replace('"', '\\"')
 
@@ -310,21 +333,21 @@ def search_result_url(site, result):
     links = result.get("_links") or {}
     webui = (links.get("webui") or "").strip()
     if webui:
-        return urllib.parse.urljoin(site["url"].rstrip("/") + "/", webui.lstrip("/"))
+        return confluence_browser_url(site, webui)
 
     tinyui = (links.get("tinyui") or "").strip()
     if tinyui:
-        return urllib.parse.urljoin(site["url"].rstrip("/") + "/", tinyui.lstrip("/"))
+        return confluence_browser_url(site, tinyui)
 
     content_id = result.get("id")
     if content_id:
-        return f"{site['url'].rstrip('/')}/wiki/pages/viewpage.action?pageId={content_id}"
-    return site["url"]
+        return f"{confluence_site_url(site)}/wiki/pages/viewpage.action?pageId={content_id}"
+    return confluence_site_url(site)
 
 
 def confluence_search_url(site, query):
     params = urllib.parse.urlencode({"text": query.strip()})
-    return f"{site['url'].rstrip('/')}/wiki/search?{params}"
+    return f"{confluence_site_url(site)}/wiki/search?{params}"
 
 
 def search_items(query):
